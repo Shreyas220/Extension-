@@ -1,0 +1,10 @@
+{
+    "description": "To track amount spent a tab",
+    "manifest_version": 1,
+    "name": "ChromyTrack",
+    "version": "0.7.1",
+  
+    "permissions": ["tabs", "storage", "cookies"],
+  
+    "browser_action": {}
+}
