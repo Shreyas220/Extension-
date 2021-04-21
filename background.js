@@ -1,8 +1,4 @@
-chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
-    let url = tabs[0].url;
-    console.log(url);
-    // use `url` here inside the callback because it's asynchronous!
-});
+
 $(document).ready(function() {
     var start = new Date();
   
@@ -16,6 +12,24 @@ $(document).ready(function() {
      });
   });
 
+  function start (){
+    var start_time = new Date();
+
+    getCurrentWindowTabs().then((tabs)=>{
+        console.log(tab.url);
+
+    })
+  }
+
+  function end(){
+      var end_time = new Date();
+      var timeSpent  = start_time - end_time;
+        console.log(timeSpent);
+    }
+
+  //function to let a start time and url 
+  document.addEventListener("DOMContentLoaded", start);
+  document.addEventListener("unload", end);
 
   // read mozilla docs for more info on browser extention APIs
   // window.onCreated/onRemoved
