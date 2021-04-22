@@ -1,24 +1,12 @@
-
-$(document).ready(function() {
-    var start = new Date();
   
-    $(window).unload(function() {
-        var end = new Date();
-        $.ajax({ 
-          url: "log.php",
-          data: {'timeSpent': end - start},
-          async: false
-        })
-     });
-  });
-
-  function start (){
+  function start (tabInfo,tabId){
     var start_time = new Date();
-
-    getCurrentWindowTabs().then((tabs)=>{
-        console.log(tab.url);
-
-    })
+    console.log(tabId)
+    if(tabId.status == "complete"){
+    console.log("website changed");
+    var start_time = new Date();
+    console.log(start_time);
+    }
   }
 
   function end(){
@@ -28,9 +16,10 @@ $(document).ready(function() {
     }
 
   //function to let a start time and url 
-  document.addEventListener("DOMContentLoaded", start);
-  document.addEventListener("unload", end);
-
-  // read mozilla docs for more info on browser extention APIs
-  // window.onCreated/onRemoved
-  // window.getCurrent().tabInfo
+  browser.tabs.onUpdated.addListener(start);
+  //browser.tabs.onLoaded.addListener(start);
+  function handleCreated(tab) {
+    console.log(tab.title);
+  }
+  
+  //browser.tabs.onCreated.addListener(handleCreated);

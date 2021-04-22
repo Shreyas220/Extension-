@@ -6,8 +6,9 @@
   
     "permissions": ["tabs", "storage", "cookies"],
     "background": {
-        "service_worker": "background.js"
+        "scripts": ["background.js"]
       },
+
     "content_scripts":[
         {
             "matches":["<all_urls>"],
