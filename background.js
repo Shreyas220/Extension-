@@ -66,7 +66,7 @@ const lastActiveTabKey = "lastActiveTab";
       chrome.storage.local.get([tabTimeObjectKey, lastActiveTabKey], (result) => {
         let lastActiveTabString = result[lastActiveTabKey];
         let tabTimeObjectString = result[tabTimeObjectKey];
-        console.log("background.js, get results");
+        console.log("get results");
         console.log(result);
         tabTimeObject = {}
         if(tabTimeObjectString != null){
@@ -79,10 +79,11 @@ const lastActiveTabKey = "lastActiveTab";
 
       });
 
-      //get lastActiveTab detail from storage 
+      //After the focus change adding tracked seconds 
       if(lastActiveTab.hasOwnProperty("url")&& lastActiveTab.hasOwnProperty("lastDateVal")){
 
         let lastUrl = lastActiveTab["url"];
+        //local scope date val
         let currentDateVal_ = Date.now();
         let passedSeconds = (currentDateVal_ - lastActiveTab["LastDateVal"]) * 0.001;
 
@@ -102,8 +103,9 @@ const lastActiveTabKey = "lastActiveTab";
 
       }
 
-      let currentDateValue = Date.new();
+      let currentDateValue = Date.now();
 
+      //if adding the new tab as lastActive tab
       let lastTabInfo = {"url": hostName, "lastDateVal": currentDateValue};
       if(!isWindowActive){
         lastTabInfo = {}
