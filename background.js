@@ -32,21 +32,21 @@ const lastActiveTabKey = "lastActiveTab";
     
     
     if(windowId == chrome.windows.WINDOW_ID_NONE){
-      processTabChanged(false);
+      processChangedTab(false);
     }else{
-      processTabChanged(true);
+      processChangedTab(true);
     }
 
 
   });
-  
+
 
   function processChangedTab(){
 
     chrome.tabs.query({'active': true}, (tabs)=>{
 
-      if (tabs.length >0 && tab[0]!= null){
-        let currentTab = tab[0];
+      if (tabs.length >0 && tabs[0]!= null){
+        let currentTab = tabs[0];
         let url = currentTab.url;
         let title = currentTab.title;
         let hostName = url;
@@ -63,7 +63,7 @@ const lastActiveTabKey = "lastActiveTab";
 
       }
       // getting information of the last active tab 
-      chrome.storage.local.get([tabTimeObjectKey, lastActiveTab], (result) => {
+      chrome.storage.local.get([tabTimeObjectKey, lastActiveTabKey], (result) => {
         let lastActiveTabString = result[lastActiveTabKey];
         let tabTimeObjectString = result[tabTimeObjectKey];
         console.log("background.js, get results");
