@@ -25,10 +25,21 @@
   
   //browser.tabs.onCreated.addListener(handleCreated);
 */
+const tabTimeObjectKey = "tabTimeObject";
+const lastActiveTabKey = "lastActiveTab";
 
   chrome.windows.onFocusChanged.addListener((windowId) => {
-      //
+    
+    
+    if(windowId == chrome.windows.WINDOW_ID_NONE){
+      processTabChanged(false);
+    }else{
+      processTabChanged(true);
+    }
+
+
   });
+  
 
   function processChangedTab(){
 
@@ -51,9 +62,24 @@
         }
 
       }
+      // getting information of the last active tab 
+      chrome.storage.local.get([tabTimeObjectKey, lastActiveTab], (result) => {
+        let lastActiveTabString = result[lastActiveTabKey];
+        let tabTimeObjectString = result[tabTimeObjectKey];
+        console.log("background.js, get results");
+        console.log(result);
+        tabTimeObject = {}
+        if(tabTimeObjectString != null){
+          tabTimeObject = JSON.parse(tabTimeObjectString);
+        }
+        lastActiveTab = {};
+        if(lastActiveTabString != null){
+          lastActiveTab = JSON.parse(lastActiveTabString);
+        }
+
+      });
 
       //get lastActiveTab detail from storage 
-
       if(lastActiveTab.hasOwnProperty("url")&& lastActiveTab.hasOwnProperty("lastDateVal")){
 
         let lastUrl = lastActiveTab["url"];
@@ -75,10 +101,28 @@
         }
 
       }
+
+      let currentDateValue = Date.new();
+
+      let lastTabInfo = {"url": hostName, "lastDateVal": currentDateValue};
+      if(!isWindowActive){
+        lastTabInfo = {}
+      }
+
+      let newLastTabObject = {}
+      newLastTabObject[lastActiveTabKey] = JSON.stringify(lastTabInfo);
+
+      chrome.storage.local.set(newLastTabObject, ()=>{
+        console.log("lastActiveTab stored: " + hostName);
+        const tabTimeObjectString = JSON.stringify(tabTimeObject);
+        let newTabTimesObject = {}
+        newTabTimesObject[tabTimeObject] = tabTimeObjectString;
+        chrome.storage.local.set(newTabTimesObject)
+      })
       
-    })
+    })//end of function 
 
 
 
 
-  }
+  }//end of function process 
