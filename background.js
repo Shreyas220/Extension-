@@ -1,4 +1,3 @@
-  
  /* 
  function start (tabInfo,tabId){
     var start_time = new Date();
@@ -25,7 +24,8 @@
   
   //browser.tabs.onCreated.addListener(handleCreated);
 */
-const tabTimeObjectKey = "tabTimeObject";
+
+
 const lastActiveTabKey = "lastActiveTab";
 
  
@@ -33,89 +33,71 @@ const lastActiveTabKey = "lastActiveTab";
 
   function processChangedTab(isWindowActive){
 
-    chrome.tabs.query({'active': true}, (tabs)=>{
-
+    browser.tabs.query({'active': true}, (tabs)=>{
+      //getting information about the current page
       if (tabs.length >0 && tabs[0]!= null){
-        let currentTab = tabs[0];
-        let url = currentTab.url;
-        let title = currentTab.title;
-        let hostName = url;
+        var currentTab = tabs[0];
+        var url = currentTab.url;
+        console.log("url"+url);
+        var title = currentTab.title;
+        var hostName = url;
         
-        console.log("current tab:" + currentTab + "url"+ url + "title:" + title+"hostname"+ hostName );
+        //console.log("current tab:" + currentTab + "url"+ url + "title:" + title+"hostname"+ hostName );
       }
-      // getting information of the last active tab 
-      chrome.storage.local.get([tabTimeObjectKey, lastActiveTabKey], (result) => {
+
+      // getting information of the last active tab    
+      browser.storage.local.get([lastActiveTabKey], (result) => {
         let lastActiveTabString = result[lastActiveTabKey];
-        let tabTimeObjectString = result[tabTimeObjectKey];
         console.log("get results");
         console.log(result);
-        tabTimeObject = {}
-        if(tabTimeObjectString != null){
-          tabTimeObject = JSON.parse(tabTimeObjectString);
-        }
         lastActiveTab = {};
+        var isFull = false;
         if(lastActiveTabString != null){
-          lastActiveTab = JSON.parse(lastActiveTabString);
+          var lastActiveTab = JSON.parse(lastActiveTabString);
+          isFull = true;
         }
 
       });
 
-      //After the focus change adding tracked seconds 
-      if(lastActiveTab.hasOwnProperty("url")&& lastActiveTab.hasOwnProperty("lastDateVal")){
 
+
+      if(isFull){
         let lastUrl = lastActiveTab["url"];
-        //local scope date val
         let currentDateVal_ = Date.now();
-        let passedSeconds = (currentDateVal_ - lastActiveTab["LastDateVal"]) * 0.001;
-
-        if (tabTimeObject.hasOwnProperty(lastUrl)){
-            let lastUrlObjectInfo = tabTimeObject[lastUrl];
-            if (lastUrlObjectInfo.hasOwnProperty("trackedseconds")){
-              lastUrlObjectInfo["trackedSeconds"] = lastUrlObjectInfo["trackedSeconds"] + passedSeconds;
-                console.log("timespent:" + lastUrlObjectInfo["trackedSeconds"])
-            }else{
-              lastUrlObjectInfo["trackedSeconds"] =  passedSeconds;
-            }
-
-        }else{
-          let newUrlInfo = {url:lastUrl , trackedSeconds : passedSeconds, lastDateVal : currentDateVal_};
-          tabTimeObject[lastUrl] = newUrlInfo; 
-        }
-
+        let passedSeconds = (currentDateVal_ - lastActiveTab["lastDateVal"]) * 0.001;
+        console.log(passedSeconds);
+        //send the data 
+        
       }
 
       let currentDateValue = Date.now();
-
       //adding the new tab as lastActive tab
       let url_ = window.location.hostname;
-      let lastTabInfo = {"url": url_, "lastDateVal": currentDateValue};
-      if(!isWindowActive){
+      let lastTabInfo = {"url": url, "lastDateVal": currentDateValue};
+      if(isWindowActive){           //and not in list 
         lastTabInfo = {}
       }
 
       let newLastTabObject = {}
       newLastTabObject[lastActiveTabKey] = JSON.stringify(lastTabInfo);
-
-      chrome.storage.local.set(newLastTabObject, ()=>{
-        console.log("lastActiveTab stored: " + url_);
-        const tabTimeObjectString = JSON.stringify(tabTimeObject);
-        let newTabTimesObject = {}
-        newTabTimesObject[tabTimeObject] = tabTimeObjectString;
+                                                 
+      browser.storage.local.set(newLastTabObject, ()=>{
+        console.log("lastActiveTab stored: " + url);
         chrome.storage.local.set(newTabTimesObject)
       })
       
-    })//end of function 
+    })//function 
 
 
 
 
-  }//end of function process 
+  }//function process 
 
 
-  chrome.windows.onFocusChanged.addListener((windowId) => {
+  browser.windows.onFocusChanged.addListener((windowId) => {
     
     
-    if(windowId == chrome.windows.WINDOW_ID_NONE){
+    if(windowId == browser.windows.WINDOW_ID_NONE){
       processChangedTab(false);
     }else{
       processChangedTab(true);
